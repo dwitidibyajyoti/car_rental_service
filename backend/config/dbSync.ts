@@ -17,10 +17,16 @@ const createVehicleType = async () => {
     try {
         // Define default vehicle types with engine type and wheel count
         const defaultVehicleTypes = [
-            { name: 'care', engineType: 'Gasoline Engine', wheelCount: '4' }, // Car
-            { name: 'truck', engineType: 'Diesel Engine', wheelCount: '4' },   // Truck
-            { name: 'motor cycle', engineType: 'Electric Engine', wheelCount: '2' }, // Motorbike
-            { name: 'scooter', engineType: 'Gasoline Engine', wheelCount: '2' }, // Motorbike
+            { name: 'car', engineType: 'Gasoline Engine', wheelCount: '4' },
+            { name: 'hatchback', engineType: 'Gasoline Engine', wheelCount: '4' },
+            { name: 'suv', engineType: 'Gasoline Engine', wheelCount: '4' },
+            { name: 'sedan', engineType: 'Gasoline Engine', wheelCount: '4' },
+            { name: 'truck', engineType: 'Diesel Engine', wheelCount: '4' },
+            { name: 'motor cycle', engineType: 'Electric Engine', wheelCount: '2' },
+            { name: 'scooter', engineType: 'Gasoline Engine', wheelCount: '2' },
+            { name: 'sports', engineType: 'Gasoline Engine', wheelCount: '2' },
+            { name: 'cruiser', engineType: 'Gasoline Engine', wheelCount: '2' },
+
 
         ];
 
@@ -49,10 +55,14 @@ const createVehicleModel = async () => {
     try {
         // Define default vehicle models with model name, brand name, and vehicle type ID
         const defaultVehicleModels = [
-            { modelName: 'Sedan', brandName: 'Toyota', vehicleTypeName: 'care' },
+            { modelName: 'Sedan', brandName: 'Toyota', vehicleTypeName: 'car' },
+            { modelName: 'Hatchback', brandName: 'Hyundai', vehicleTypeName: 'hatchback' },
+            { modelName: 'SUV', brandName: 'Jeep', vehicleTypeName: 'suv' },
             { modelName: 'Pickup', brandName: 'Ford', vehicleTypeName: 'truck' },
             { modelName: 'Sport', brandName: 'Yamaha', vehicleTypeName: 'motor cycle' },
             { modelName: 'Scooter', brandName: 'Honda', vehicleTypeName: 'scooter' },
+            { modelName: 'Sports Bike', brandName: 'Kawasaki', vehicleTypeName: 'sports' },
+            { modelName: 'Cruiser', brandName: 'Harley-Davidson', vehicleTypeName: 'cruiser' }
         ];
 
         // Loop through default vehicle models and create if not exists

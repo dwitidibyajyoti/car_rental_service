@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 import Booking from '../models/booking.model';
 import cors from 'cors';
 import VehicleType from '../models/vehicleType.model';
-
+import { Op } from 'sequelize';
 import '../config/dbSync';
 import VehicleModel from '../models/vehicleModel.model';
 
@@ -123,13 +123,46 @@ app.post('/booking/submit', async (req: any, res: any) => {
     try {
         const { id, vehicleModelId, startDate, endDate } = req.body;
 
+        // Check for existing bookings with overlapping dates and the same model, excluding "Completed" bookings
+        const existingBooking = await Booking.findOne({
+            where: {
+                vehicleModelId,
+                status: { [Op.ne]: 'Completed' }, // Exclude bookings with status "Completed"
+                id: { [Op.ne]: id }, // Exclude the current booking being updated
+                [Op.or]: [
+                    {
+                        bookingStartDate: {
+                            [Op.between]: [new Date(startDate), new Date(endDate)]
+                        }
+                    },
+                    {
+                        bookingEndDate: {
+                            [Op.between]: [new Date(startDate), new Date(endDate)]
+                        }
+                    },
+                    {
+                        [Op.and]: [
+                            { bookingStartDate: { [Op.lte]: new Date(startDate) } },
+                            { bookingEndDate: { [Op.gte]: new Date(endDate) } }
+                        ]
+                    }
+                ]
+            }
+        });
+        console.log(existingBooking, '>>>>>>>>>>>>>>>>>>>>>>>>>>>>>pppp');
+
+
+        if (existingBooking) {
+            return res.status(409).json({ message: 'The selected vehicle model is already booked during the requested time period.' });
+        }
+
         // Update the booking only if the booking with the provided ID exists
         const [affectedRows] = await Booking.update(
             {
                 vehicleModelId,
                 bookingStartDate: new Date(startDate),
                 bookingEndDate: new Date(endDate),
-                status: 'Pending', // Default status
+                status: 'Completed', // Default status for this scenario
             },
             {
                 where: { id }, // Update only the booking with the matching id
@@ -146,6 +179,7 @@ app.post('/booking/submit', async (req: any, res: any) => {
         return res.status(500).json({ message: 'Error updating booking' });
     }
 });
+
 
 
 app.listen(PORT, () => {

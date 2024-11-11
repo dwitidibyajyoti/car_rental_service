@@ -1,16 +1,26 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { TextField, Box, Typography } from '@mui/material';
 
 interface DateRangePickerProps {
     onDateRangeChange: (startDate: Date, endDate: Date) => void;
+    startDate: Date | null;
+    endDate: Date | null;
 }
 
-const DateRangePicker: React.FC<DateRangePickerProps> = ({ onDateRangeChange }) => {
-    const [startDate, setStartDate] = React.useState<string>('');
-    const [endDate, setEndDate] = React.useState<string>('');
+const DateRangePicker: React.FC<DateRangePickerProps> = ({ onDateRangeChange, startDate, endDate }) => {
+    useEffect(() => {
+        if (startDate && endDate) {
+            onDateRangeChange(startDate, endDate); // Initially set the values on load
+        }
+    }, [startDate, endDate, onDateRangeChange]);
 
-    const handleDateChange = () => {
-        onDateRangeChange(new Date(startDate), new Date(endDate));
+    const handleDateChange = (field: 'start' | 'end', value: string) => {
+        const updatedDate = new Date(value);
+        if (field === 'start') {
+            onDateRangeChange(updatedDate, endDate ?? new Date());
+        } else {
+            onDateRangeChange(startDate ?? new Date(), updatedDate);
+        }
     };
 
     return (
@@ -22,22 +32,16 @@ const DateRangePicker: React.FC<DateRangePickerProps> = ({ onDateRangeChange }) 
                     type="date"
                     variant="outlined"
                     fullWidth
-                    value={startDate}
-                    onChange={(e) => {
-                        setStartDate(e.target.value);
-                        handleDateChange();
-                    }}
+                    value={startDate ? startDate.toISOString().split('T')[0] : ''} // Check before formatting
+                    onChange={(e) => handleDateChange('start', e.target.value)}
                 />
                 <TextField
                     label="End Date"
                     type="date"
                     variant="outlined"
                     fullWidth
-                    value={endDate}
-                    onChange={(e) => {
-                        setEndDate(e.target.value);
-                        handleDateChange();
-                    }}
+                    value={endDate ? endDate.toISOString().split('T')[0] : ''} // Check before formatting
+                    onChange={(e) => handleDateChange('end', e.target.value)}
                 />
             </div>
         </Box>

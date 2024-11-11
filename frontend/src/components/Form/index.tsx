@@ -19,6 +19,8 @@ const FormContainer: React.FC = () => {
     // Function to move to the next step with validation
     const handleNext = async () => {
         if (step === 0) {
+            console.log(name.firstName, name.lastName, '>>>>>>>>>>>>>');
+
             if (!name.firstName || !name.lastName) {
                 alert('Please enter both first name and last name before proceeding.');
                 return;
@@ -38,9 +40,9 @@ const FormContainer: React.FC = () => {
                 const responseData = await response.json();
                 console.log('Response from server:', responseData);
                 setBookingId(responseData.id);
-            } catch (error) {
-                console.error('Error submitting name:', error);
-                alert('An error occurred while submitting your name. Please try again.');
+            } catch (error: any) {
+                console.error('Error submitting name:', error.response);
+                // alert(`An error occurred: ${error.message}`);
                 return;
             }
         }
@@ -71,7 +73,22 @@ const FormContainer: React.FC = () => {
                 alert('Please select both start and end dates.');
                 return;
             }
+
+            const currentDate = new Date();
+
+            // Check if startDate is before endDate
+            if (startDate <= endDate) {
+                alert('The start date should be earlier than the end date.');
+                return;
+            }
+
+            // Check if both dates are greater than the current date
+            if (startDate <= currentDate || endDate <= currentDate) {
+                alert('Both start and end dates should be in the future.');
+                return;
+            }
         }
+
 
         if (step < 4) {
             setStep(step + 1);
@@ -82,6 +99,24 @@ const FormContainer: React.FC = () => {
     const handleSubmit = async () => {
         if (!bookingId || !startDate || !endDate || !model) {
             alert('Please complete the form before submitting.');
+            return;
+        }
+
+        // Ensure startDate and endDate are Date objects
+        const startDateObj = new Date(startDate);
+        const endDateObj = new Date(endDate);
+
+        const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Reset current date to midnight
+
+        // Validate the dates
+        if (startDateObj >= endDateObj) {
+            alert('The end date should be the same as or later than the start date.');
+            return;
+        }
+        console.log(`startDateObj>>>>>>>>>>endDateObj`, startDateObj, endDateObj);
+        if (startDateObj <= currentDate || endDateObj <= currentDate) {
+            alert('Both start and end dates should be in the future.');
             return;
         }
 
@@ -105,16 +140,17 @@ const FormContainer: React.FC = () => {
             console.log('Booking submitted successfully:', responseData);
             alert('Booking submitted successfully!');
             window.location.reload();
-        } catch (error) {
-            console.error('Error submitting booking:', error);
+        } catch (error: any) {
+            console.error('Error submitting booking:', error.response);
             alert('An error occurred while submitting the booking. Please try again.');
         }
     };
 
+
     return (
         <Container className="space-y-6 py-8">
             {step === 0 && (
-                <NameInputComponent onNameChange={(firstName, lastName) => setName({ firstName, lastName })} />
+                <NameInputComponent onNameChange={(firstName, lastName) => setName({ firstName, lastName })} name={name} />
             )}
             {step === 1 && <WheelsSelector onWheelsChange={setWheels} />}
             {step === 2 && <VehicleTypeSelector wheels={wheels} onVehicleTypeChange={setVehicleType} />}
@@ -123,7 +159,8 @@ const FormContainer: React.FC = () => {
                 <DateRangePicker onDateRangeChange={(start, end) => {
                     setStartDate(start);
                     setEndDate(end);
-                }} />
+                }} startDate={startDate}
+                    endDate={endDate} />
             )}
 
             <Box mt={4}>

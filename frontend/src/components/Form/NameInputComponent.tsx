@@ -3,14 +3,12 @@ import { TextField, Box, Typography } from '@mui/material';
 
 interface NameInputProps {
     onNameChange: (firstName: string, lastName: string) => void;
+    name: { firstName: string; lastName: string };
 }
 
-const NameInputComponent: React.FC<NameInputProps> = ({ onNameChange }) => {
-    const [firstName, setFirstName] = React.useState('');
-    const [lastName, setLastName] = React.useState('');
-
-    const handleNameChange = () => {
-        onNameChange(firstName, lastName);
+const NameInputComponent: React.FC<NameInputProps> = ({ onNameChange, name }) => {
+    const handleNameChange = (field: 'firstName' | 'lastName', value: string) => {
+        onNameChange(field === 'firstName' ? value : name.firstName, field === 'lastName' ? value : name.lastName);
     };
 
     return (
@@ -21,21 +19,15 @@ const NameInputComponent: React.FC<NameInputProps> = ({ onNameChange }) => {
                     label="First Name"
                     variant="outlined"
                     fullWidth
-                    value={firstName}
-                    onChange={(e) => {
-                        setFirstName(e.target.value);
-                        handleNameChange();
-                    }}
+                    value={name.firstName}
+                    onChange={(e) => handleNameChange('firstName', e.target.value)}
                 />
                 <TextField
                     label="Last Name"
                     variant="outlined"
                     fullWidth
-                    value={lastName}
-                    onChange={(e) => {
-                        setLastName(e.target.value);
-                        handleNameChange();
-                    }}
+                    value={name.lastName}
+                    onChange={(e) => handleNameChange('lastName', e.target.value)}
                 />
             </div>
         </Box>
